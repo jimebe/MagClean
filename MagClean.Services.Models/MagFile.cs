@@ -18,7 +18,13 @@ namespace MagClean.Services.Models
 
         public decimal Easting { get; set; }
 
+        public int EastingRounded { get { return (int)Math.Round(Easting, 0); } }
+
         public decimal Northing { get; set; }
+
+        public int NorthingRounded { get { return (int)Math.Round(Northing, 0); } }
+
+        public string EastingNorthingRounded { get { return NorthingRounded.ToString() + " - " + EastingRounded.ToString(); } }
 
         public int Elevation { get; set; }
 

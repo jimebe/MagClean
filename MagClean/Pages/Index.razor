@@ -113,6 +113,23 @@ else
                             </div>
                         </div>
                     </div>
+                    <div class="accordion-item">
+                        @{
+                            var heatMapId = "location-heatmap-" + new Guid();
+                            var heatMapHeaderId = heatMapId + "-header";
+                        }
+                        <h2 class="accordion-header" id="@heatMapHeaderId">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#@heatMapId"
+                            aria-expanded="true" aria-controls="@heatMapId">
+                                Location Heat Map
+                            </button>
+                        </h2>
+                        <div id="@heatMapId" class="accordion-collapse collapse" aria-labelledby="@heatMapHeaderId">
+                            <div class="accordion-body">
+                                <MagClean.Components.Charts.Heatmap File="@analysisResult.File" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
