@@ -1,0 +1,198 @@
+﻿@page "/"
+@using Microsoft.Extensions.Logging
+@using System.IO
+@using System.Text
+@inject ILogger<Index> Logger
+@inject IMagFileService MagFileService
+
+
+<InputFile OnChange="@LoadFiles" accept=".txt" />
+
+@if (isLoading)
+{
+    <p>Processing...</p>
+}
+else
+{
+    if (Errors.Any())
+    {
+        foreach (var error in Errors)
+        {
+            <div class="text-danger">
+                @error
+            </div>
+        }
+    }
+    @foreach (var analysisResult in analysisResults)
+    {
+        var id = new Guid();
+        <div class="card mt-4 me-4">
+            <div class="card-body">
+                <div class="row pb-3">
+                    <div class="col">
+                        @analysisResult.File.Name
+                    </div>
+                    <div class="col text-end">
+                        <button type="button" class="btn btn-primary" @onclick="@(() => ExportFile(analysisResult.File))">
+                            Export
+                        </button>
+                    </div>
+                </div>
+                <div class="accordion" id="analysis-accordion">
+                    <div class="accordion-item">
+                        @{
+                            var magCleanSectionId = "mag-clean-" + new Guid();
+                            var magCleanHeaderId = magCleanSectionId + "-header";
+                        }
+                        <h2 class="accordion-header" id="@magCleanHeaderId">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#@magCleanSectionId" aria-expanded="true" aria-controls="@magCleanSectionId">
+                                nT Clean
+                            </button>
+                        </h2>
+                        <div id="@magCleanSectionId" class="accordion-collapse collapse" aria-labelledby="@magCleanHeaderId">
+                            <div class="accordion-body">
+                                <div class="row pb-2">
+                                    <div class="col">
+                                        <div class="row">
+                                            <label for="ntCleanMin" class="col col-auto col-form-label">Min</label>
+                                            <div class="col">
+                                                <input type="text" class="form-control" id="ntCleanMin" @bind="ntMin">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="row">
+                                            <label for="ntCleanMax" class="col col-auto col-form-label">Max</label>
+                                            <div class="col">
+                                                <input type="text" class="form-control" id="ntCleanMax" @bind="ntMax">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col col-auto text-end">
+                                        <button type="button" class="btn btn-secondary" @onclick="@(() => RemoveMagNanoTeslasByRange(analysisResult.File))">
+                                            Apply
+                                        </button>
+                                    </div>
+                                </div>
+                                @{
+                                    var magNanoTeslas = analysisResult.File.Lines
+                            .Where(x => !x.Metadata)
+                            .GroupBy(x => x.MagNanoTeslasRounded)
+                            .ToDictionary(z => z.Key, z => z.Count())
+                            .OrderBy(x => x.Key);
+                                }
+                                <table class="table">
+                                    <thead>
+                                    <th scope="col">
+                                        Mag Nano Teslas
+                                    </th>
+                                    <th scope="col">
+                                        Count
+                                    </th>
+                                    <th scope="col"></th>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var line in magNanoTeslas)
+                                        {
+                                            <tr>
+                                                <td scope="row">
+                                                    @line.Key
+                                                </td>
+                                                <td>
+                                                    @line.Value
+                                                </td>
+                                                <td class="col-1">
+                                                    <button type="button" class="btn btn-secondary" @onclick="@(() => RemoveMagNanoTeslas(analysisResult.File, line.Key))">
+                                                        Remove
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private List<MagFileAnalysisResult> analysisResults = new();
+    private List<string> Errors = new();
+    private int maxAllowedFiles = 3;
+    private bool isLoading;
+    private int ntMin;
+    private int ntMax;
+    [Inject] public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+
+    public async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        isLoading = true;
+        ntMin = 0;
+        ntMax = 0;
+        List<Services.Models.MagFileUpload> uploadedFiles = new();
+        Errors = new List<string>();
+        var maxFileSize = 10000000;
+        foreach (var file in e.GetMultipleFiles(maxAllowedFiles))
+        {
+            try
+            {
+                var uploadedFile = new Services.Models.MagFileUpload();
+                uploadedFile.Name = file.Name;
+                using (var reader = new StreamReader(file.OpenReadStream(maxFileSize)))
+                {
+                    uploadedFile.Content = await reader.ReadToEndAsync();
+                }
+                uploadedFiles.Add(uploadedFile);
+            }
+            catch (Exception ex)
+            {
+                Errors.Add(ex.Message.ToString());
+                Logger.LogError("File: {Filename} Error: {Error}",
+                    file.Name, ex.Message);
+            }
+        }
+        if (uploadedFiles.Any())
+        {
+            var results = await MagFileService.UploadFiles(uploadedFiles.AsEnumerable());
+            analysisResults = results.ToList();
+        }
+        else
+        {
+            Errors.Add("No files to process");
+        }
+
+        isLoading = false;
+    }
+
+    public bool RemoveMagNanoTeslas(MagFile file, int magNanoTeslasRounded)
+    {
+        file.Lines = file.Lines.Where(x => x.MagNanoTeslasRounded != magNanoTeslasRounded).ToList();
+        return true;
+    }
+
+    public async void ExportFile(MagFile file)
+    {
+        var fileName = file.Name.ToLower().Replace(".txt", "-clean.txt");
+        var contentBuilder = new StringBuilder();
+        contentBuilder.Append("\r\n");
+        file.Lines.ForEach(x => contentBuilder.Append(!string.IsNullOrWhiteSpace(x.Value) ? $"\r\n{x.Value}" : ""));
+        contentBuilder.Append("\r\n");
+        var content = contentBuilder.ToString();
+        var contentBytes = Encoding.ASCII.GetBytes(content);
+        await BlazorDownloadFileService.DownloadFileAsync(fileName, contentBytes);
+    }
+
+    public void RemoveMagNanoTeslasByRange(MagFile file)
+    {
+        if (ntMax == 0)
+        {
+            ntMax = int.MaxValue;
+        }
+
+        file.Lines = file.Lines.Where(x => x.Metadata || (x.MagNanoTeslasRounded >= ntMin && x.MagNanoTeslasRounded <= ntMax)).ToList();
+    }
+}

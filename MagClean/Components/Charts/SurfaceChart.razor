@@ -1,0 +1,67 @@
+﻿@using Plotly.Blazor.LayoutLib
+@using System.Globalization
+<PlotlyChart style="height: 60vh; min-height: 350px" Layout="layout" Config="config" Data="data" Id="MapChart" @ref="plotlyChart" />
+
+@code {
+    PlotlyChart plotlyChart;
+    Layout layout;
+    Config config;
+    IList<ITrace> data;
+
+
+    /// <inheritdoc />
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        layout = new Layout
+        {
+            Title = new Title
+            {
+                Text = ""
+            },
+            Margin = new Margin
+            {
+                L = 65,
+                R = 50,
+                B = 65,
+                T = 90
+            }
+        };
+
+        config = new Config
+        {
+            ShowLink = false,
+            Responsive = true,
+            DisplayLogo = false
+        };
+        data = GetMapData();
+    }
+
+    IList<ITrace> GetMapData()
+    {
+        IList<ITrace> mapData = new List<ITrace>();
+
+
+
+        //var z = new List<decimal[]>();
+
+        //foreach (var row in csv)
+        //{
+        //    var currentValues = new List<decimal>();
+
+        //    for (var i = 1; i < 25; i++)
+        //    {
+        //        currentValues.Add(decimal.Parse(row[i], NumberStyles.Any, CultureInfo.InvariantCulture));
+        //    }
+
+        //    z.Add(currentValues.ToArray());
+        //}
+
+        //mapData.Add(new Surface()
+        //{
+        //    Z = z.Cast<object>().ToList()
+        //});
+
+        return mapData;
+    }
+}

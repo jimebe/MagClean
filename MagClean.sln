@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31423.177
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagClean", "MagClean\MagClean.csproj", "{8549AAFD-B96F-40CF-B675-44129FD5861E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagClean.Services", "MagClean.Services\MagClean.Services.csproj", "{0431E990-8B98-4BA9-8ED9-CBB6B0C3D48A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagClean.Services.Models", "MagClean.Services.Models\MagClean.Services.Models.csproj", "{E64E6610-1B3C-4385-8130-C6FA5E69090B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagClean.Client", "MagClean.Client\MagClean.Client.csproj", "{841693AD-C4DA-49C2-AB2B-B52716339593}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagClean.Client.Models", "MagClean.Client.Models\MagClean.Client.Models.csproj", "{7596BFC7-6E59-433C-96C0-2301E95146DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8549AAFD-B96F-40CF-B675-44129FD5861E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8549AAFD-B96F-40CF-B675-44129FD5861E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8549AAFD-B96F-40CF-B675-44129FD5861E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8549AAFD-B96F-40CF-B675-44129FD5861E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0431E990-8B98-4BA9-8ED9-CBB6B0C3D48A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0431E990-8B98-4BA9-8ED9-CBB6B0C3D48A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0431E990-8B98-4BA9-8ED9-CBB6B0C3D48A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0431E990-8B98-4BA9-8ED9-CBB6B0C3D48A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E64E6610-1B3C-4385-8130-C6FA5E69090B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E64E6610-1B3C-4385-8130-C6FA5E69090B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E64E6610-1B3C-4385-8130-C6FA5E69090B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E64E6610-1B3C-4385-8130-C6FA5E69090B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{841693AD-C4DA-49C2-AB2B-B52716339593}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{841693AD-C4DA-49C2-AB2B-B52716339593}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{841693AD-C4DA-49C2-AB2B-B52716339593}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{841693AD-C4DA-49C2-AB2B-B52716339593}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7596BFC7-6E59-433C-96C0-2301E95146DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7596BFC7-6E59-433C-96C0-2301E95146DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7596BFC7-6E59-433C-96C0-2301E95146DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7596BFC7-6E59-433C-96C0-2301E95146DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7D782225-7A60-4480-A29C-12A8C0A9407D}
+	EndGlobalSection
+EndGlobal
