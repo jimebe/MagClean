@@ -24,7 +24,7 @@ namespace MagClean.Services.Models
 
         public int NorthingRounded { get { return (int)Math.Round(Northing, 0); } }
 
-        public string EastingNorthingRounded { get { return NorthingRounded.ToString() + " - " + EastingRounded.ToString(); } }
+        public string EastingNorthingRounded { get { return EastingRounded.ToString() + " - " + NorthingRounded.ToString(); } }
 
         public int Elevation { get; set; }
 

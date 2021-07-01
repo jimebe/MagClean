@@ -3,21 +3,34 @@
 @using Plotly.Blazor.LayoutLib.XAxisLib
 @using Font = Plotly.Blazor.LayoutLib.AnnotationLib.Font
 
-<PlotlyChart style="min-height: 60vh; min-height: 350px" Layout="layout" Config="config" Data="data" Id="HeatMapChart" @ref="plotlyChart" />
+@if (Loading)
+{
+    <div>Loading...</div>
+}
+else if (Loaded)
+{
+    <PlotlyChart style="min-height: 80vh; min-height: 600px" Layout="layout" Config="config" Data="data" Id="HeatMapChart" @ref="plotlyChart" />
+}
+else
+{
+    <button type="button" class="btn btn-secondary" @onclick="LoadHeatmap">Load</button>
+}
 
 @code {
     PlotlyChart plotlyChart;
     Layout layout;
     Config config;
     IList<ITrace> data;
+    bool Loaded;
+    bool Loading;
 
     [Parameter]
     public MagFile File { get; set; }
 
-    /// <inheritdoc />
-    public override async Task SetParametersAsync(ParameterView parameters)
+    public async Task LoadHeatmap()
     {
-        await base.SetParametersAsync(parameters);
+        Loading = true;
+        StateHasChanged();
         layout = new Layout
         {
             Title = new Plotly.Blazor.LayoutLib.Title
@@ -27,19 +40,19 @@
             Annotations = new List<Annotation>(),
             XAxis = new List<XAxis>
     {
-        new ()
-        {
-            Ticks = TicksEnum.Empty,
-            Side = SideEnum.Top
-        }
+    new ()
+    {
+    Ticks = TicksEnum.Empty,
+    Side = SideEnum.Top
+    }
     },
             YAxis = new List<YAxis>
     {
-        new ()
-        {
-            Ticks = Plotly.Blazor.LayoutLib.YAxisLib.TicksEnum.Empty,
-            TickSuffix = " ",
-        }
+    new ()
+    {
+    Ticks = Plotly.Blazor.LayoutLib.YAxisLib.TicksEnum.Empty,
+    TickSuffix = " ",
+    }
     }
         };
 
@@ -51,7 +64,9 @@
         };
         data = GetMapData();
 
-        AddAnnotations(layout, data.First());
+        //AddAnnotations(layout, data.First());
+        Loading = false;
+        Loaded = true;
     }
 
     IList<ITrace> GetMapData()
@@ -70,6 +85,7 @@
             var t1 = yRange.Count();
             var zValues = new int?[yRange.Count()][];
             var highestCount = 0;
+            var valueLookup = File.Lines.GroupBy(x => x.EastingNorthingRounded).ToDictionary(y => y.Key, y => y.Count());
             for (int y = 0; y < yRange.Count(); y++)
             {
                 var values = new int?[xRange.Count()];
@@ -77,18 +93,36 @@
                 for (int x = 0; x < xRange.Count(); x++)
                 {
                     var xValue = xRange[x];
-                    var count = File.Lines.Where(nr => nr.EastingRounded == xValue && nr.NorthingRounded == yValue).Count();
-                    
-                    values[x] = count > 0 ? count : null;
-                    if (count > highestCount)
+                    var keyValue = xValue + " - " + yValue;
+                    int? count = valueLookup.ContainsKey(keyValue) ? valueLookup[keyValue] : null;
+                    if (count.HasValue && count.Value > highestCount)
                     {
-                        highestCount = count;
+                        highestCount = count.Value;
                     }
+
+                    //var textColor = count != 0 ? "white" : "black";
+
+                    //var annotation = new Annotation
+                    //{
+                    //    XRef = "x1",
+                    //    YRef = "y1",
+                    //    X = xValue,
+                    //    Y = yValue,
+                    //    Text = count > 0 ? count.ToString() : string.Empty,
+                    //    Font = new Font
+                    //    {
+                    //        Family = "Arial",
+                    //        Size = 12,
+                    //        Color = textColor
+                    //    },
+                    //    ShowArrow = false,
+                    //};
+                    //layout.Annotations.Add(annotation);
                 }
                 zValues[y] = values;
             }
 
-            var colorRange = Enumerable.Range(yMax, highestCount);
+            var colorRange = Enumerable.Range(0, highestCount);
             var colorScale = new string[colorRange.Count()][];
             for (int cs = 0; cs < colorScale.Count(); cs++)
             {
